@@ -482,7 +482,7 @@ namespace StableDiffusionWinForms
             return undownloadedGenerationIds;
         }
 
-        private async Task<bool success, Image image, string message> GetUpscaledImageAsync(string generationId, string apiKey)
+        private async Task<(bool success, Image image, string message)> GetUpscaledImageAsync(string generationId, string apiKey)
         {
             // Will return tuple of bool (success/other), Image (if success), string (error message if fail or other)
             string errorMessage = null;
@@ -512,7 +512,7 @@ namespace StableDiffusionWinForms
                         // The image is still being generated, so we can skip this one
                         return (false, null, errorMessage);
                     }
-                
+                }
                 else
                 {
                     string errorDetails = await response.Content.ReadAsStringAsync();
