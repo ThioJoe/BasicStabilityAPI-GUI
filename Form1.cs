@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -26,16 +27,39 @@ namespace StableDiffusionWinForms
 
         private string LoadApiKey()
         {
-            if (File.Exists(ApiKeyFileName))
+            if (!File.Exists(ApiKeyFileName))
             {
-                return File.ReadAllText(ApiKeyFileName);
-            }
-            else
-            {
+                // Create an empty file if it doesn't exist
                 File.WriteAllText(ApiKeyFileName, "");
+                ShowError($"Missing API key. Add API key to {ApiKeyFileName}.");
                 return "";
             }
+
+            var lines = File.ReadAllLines(ApiKeyFileName);
+            foreach (var line in lines)
+            {
+                // Skip empty lines and lines starting with '#'
+                if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
+                    continue;
+
+                // Check if the line starts with "sk-"
+                if (line.StartsWith("sk-"))
+                    return line.Trim();
+            }
+
+            // If we get here, no valid API key was found
+            ShowError($"Valid API key not found in the file: {ApiKeyFileName}.");
+            return "";
         }
+
+        private void ShowError(string message)
+        {
+            lblError.Text = message;
+            lblError.ForeColor = Color.Red; // Set the text color to red to indicate an error
+            lblError.Visible = true; // Ensure the label is visible if it was previously hidden
+        }
+
+
 
         private void SaveApiKey(string apiKey)
         {

@@ -64,6 +64,7 @@
             this.btnSaveApiKey = new System.Windows.Forms.Button();
             this.lblApiKeyStatus = new System.Windows.Forms.Label();
             this.ApiKeyLabel = new System.Windows.Forms.Label();
+            this.lblError = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudImageCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudSeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudUpscaleSeed)).BeginInit();
@@ -118,7 +119,6 @@
             this.cmbModel.Name = "cmbModel";
             this.cmbModel.Size = new System.Drawing.Size(178, 28);
             this.cmbModel.TabIndex = 3;
-            this.cmbModel.SelectedIndex = 0; // Default to SD3
             // 
             // cmbAspectRatio
             // 
@@ -139,7 +139,6 @@
             this.cmbAspectRatio.Name = "cmbAspectRatio";
             this.cmbAspectRatio.Size = new System.Drawing.Size(178, 28);
             this.cmbAspectRatio.TabIndex = 4;
-            this.cmbAspectRatio.SelectedIndex = 0; // Default to 1:1
             // 
             // nudSeed
             // 
@@ -166,7 +165,6 @@
             this.cmbOutputFormat.Name = "cmbOutputFormat";
             this.cmbOutputFormat.Size = new System.Drawing.Size(178, 28);
             this.cmbOutputFormat.TabIndex = 6;
-            this.cmbOutputFormat.SelectedIndex = 0; // Default to png
             // 
             // btnGenerate
             // 
@@ -231,7 +229,6 @@
             this.cmbUpscaleOutputFormat.Name = "cmbUpscaleOutputFormat";
             this.cmbUpscaleOutputFormat.Size = new System.Drawing.Size(178, 28);
             this.cmbUpscaleOutputFormat.TabIndex = 12;
-            this.cmbUpscaleOutputFormat.SelectedIndex = 0; // Default to png
             // 
             // nudUpscaleCreativity
             // 
@@ -474,11 +471,22 @@
             this.ApiKeyLabel.TabIndex = 32;
             this.ApiKeyLabel.Text = "API Key";
             // 
+            // lblError
+            // 
+            this.lblError.AutoSize = true;
+            this.lblError.Location = new System.Drawing.Point(408, 703);
+            this.lblError.Name = "lblError";
+            this.lblError.Size = new System.Drawing.Size(44, 20);
+            this.lblError.TabIndex = 33;
+            this.lblError.Text = "Error";
+            this.lblError.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1099, 746);
+            this.Controls.Add(this.lblError);
             this.Controls.Add(this.ApiKeyLabel);
             this.Controls.Add(this.MainTitleLabel);
             this.Controls.Add(this.ImageUpscaleTitleLabel);
@@ -565,5 +573,6 @@
         private System.Windows.Forms.Button btnSaveApiKey;
         private System.Windows.Forms.Label lblApiKeyStatus;
         private System.Windows.Forms.Label ApiKeyLabel;
+        private System.Windows.Forms.Label lblError;
     }
 }
