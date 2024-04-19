@@ -65,6 +65,8 @@
             this.lblApiKeyStatus = new System.Windows.Forms.Label();
             this.ApiKeyLabel = new System.Windows.Forms.Label();
             this.lblError = new System.Windows.Forms.Label();
+            this.GenerationStatusLabel = new System.Windows.Forms.Label();
+            this.UpscaleStatusLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudImageCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudSeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudUpscaleSeed)).BeginInit();
@@ -481,11 +483,33 @@
             this.lblError.Text = "Error";
             this.lblError.Visible = false;
             // 
+            // GenerationStatusLabel
+            // 
+            this.GenerationStatusLabel.AutoSize = true;
+            this.GenerationStatusLabel.Location = new System.Drawing.Point(200, 632);
+            this.GenerationStatusLabel.Name = "GenerationStatusLabel";
+            this.GenerationStatusLabel.Size = new System.Drawing.Size(175, 20);
+            this.GenerationStatusLabel.TabIndex = 34;
+            this.GenerationStatusLabel.Text = "GenerationStatusLabel";
+            this.GenerationStatusLabel.Visible = false;
+            // 
+            // UpscaleStatusLabel
+            // 
+            this.UpscaleStatusLabel.AutoSize = true;
+            this.UpscaleStatusLabel.Location = new System.Drawing.Point(576, 702);
+            this.UpscaleStatusLabel.Name = "UpscaleStatusLabel";
+            this.UpscaleStatusLabel.Size = new System.Drawing.Size(153, 20);
+            this.UpscaleStatusLabel.TabIndex = 35;
+            this.UpscaleStatusLabel.Text = "UpscaleStatusLabel";
+            this.UpscaleStatusLabel.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1099, 746);
+            this.Controls.Add(this.UpscaleStatusLabel);
+            this.Controls.Add(this.GenerationStatusLabel);
             this.Controls.Add(this.lblError);
             this.Controls.Add(this.ApiKeyLabel);
             this.Controls.Add(this.MainTitleLabel);
@@ -575,5 +599,7 @@
         private System.Windows.Forms.Label lblApiKeyStatus;
         private System.Windows.Forms.Label ApiKeyLabel;
         private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Label GenerationStatusLabel;
+        private System.Windows.Forms.Label UpscaleStatusLabel;
     }
 }

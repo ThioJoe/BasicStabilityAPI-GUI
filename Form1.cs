@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -119,7 +120,6 @@ namespace StableDiffusionWinForms
                 return; // Exit the function if the prompt is empty
             }
 
-
             var imageParams = new Dictionary<string, object>
             {
                 { "model", model },
@@ -132,7 +132,15 @@ namespace StableDiffusionWinForms
             };
 
             string apiKey = LoadApiKey();
+
+            // Set Status Label
+            GenerationStatusLabel.Text = "Generating...";
+            GenerationStatusLabel.ForeColor = Color.Blue;
+            GenerationStatusLabel.Visible = true;
+
             var generatedImages = await GenerateImagesAsync(apiKey, imageParams, imageCount);
+
+            GenerationStatusLabel.Visible = false; // Hide the status label after response comes back, whether success or failure
 
             if (generatedImages != null && generatedImages.Any())
             {
@@ -298,7 +306,15 @@ namespace StableDiffusionWinForms
             };
 
             string apiKey = LoadApiKey();
+
+            // Set status label
+            UpscaleStatusLabel.Text = "Upscaling...";
+            UpscaleStatusLabel.ForeColor = Color.Blue;
+            UpscaleStatusLabel.Visible = true;
+
             var generationId = await SendUpscaleRequestAsync(imagePath, imageParams, apiKey);
+            UpscaleStatusLabel.Visible = false; // Hide the status label after response comes back, whether success or failure
+
             if (!string.IsNullOrEmpty(generationId))
             {
                 LogUpscaleRequest(generationId, imagePath, imageParams);
@@ -392,24 +408,54 @@ namespace StableDiffusionWinForms
         private async void btnDownloadUpscaledImages_Click(object sender, EventArgs e)
         {
             string logFilePath = Path.Combine(UpscaleOutputFolder, "ID_Filename_Log.txt");
+
+            // Set Status Label
+            UpscaleStatusLabel.Text = "Checking for undownloaded files...";
+            UpscaleStatusLabel.ForeColor = Color.Blue;
+            UpscaleStatusLabel.Visible = true;
+
             var undownloadedGenerationIds = GetUndownloadedGenerationIds(logFilePath);
 
             if (undownloadedGenerationIds.Any())
             {
                 string apiKey = LoadApiKey();
+
+                // Update status label with the number of images to download
+                UpscaleStatusLabel.Text = $"Downloading {undownloadedGenerationIds.Count()} images...";
+                UpscaleStatusLabel.Refresh(); // Optionally force the label to refresh the display
+
+                // List to store the generation IDs of images that failed to download
+                var failedGenerationIds = new List<string>();
+
                 foreach (var generationId in undownloadedGenerationIds)
                 {
-                    var upscaledImage = await GetUpscaledImageAsync(generationId, apiKey);
+                    var (success, upscaledImage, message) = await GetUpscaledImageAsync(generationId, apiKey);
                     if (upscaledImage != null)
                     {
                         SaveUpscaledImage(generationId, upscaledImage);
                         UpdateLogFile(logFilePath, generationId);
                     }
+                    else
+                    {
+                        // If the image download fails, we can skip updating the log file. Record which images failed then display after all downloads are attempted
+                        failedGenerationIds.Add(generationId);
+                        continue;
+                    }
                 }
-            }
+                UpscaleStatusLabel.Visible = false; // Hide the status label after response comes back, whether success or failure
+                // Show a message box to indicate the completion of the download process and any errors
+                if (failedGenerationIds.Any())
+                {
+                    MessageBox.Show($"Downloaded {undownloadedGenerationIds.Count - failedGenerationIds.Count} images successfully.\n\nFailed to download images with Generation IDs:\n{string.Join("\n  ", failedGenerationIds)}");
+                }
+                else
+                {
+                    MessageBox.Show("All images downloaded successfully.");
+                }
+             }
             else
             {
-                MessageBox.Show("All upscaled images have already been downloaded.");
+                MessageBox.Show("All upscaled images had already been downloaded, so none were downloaded now.");
             }
         }
 
@@ -436,8 +482,11 @@ namespace StableDiffusionWinForms
             return undownloadedGenerationIds;
         }
 
-        private async Task<Image> GetUpscaledImageAsync(string generationId, string apiKey)
+        private async Task<bool success, Image image, string message> GetUpscaledImageAsync(string generationId, string apiKey)
         {
+            // Will return tuple of bool (success/other), Image (if success), string (error message if fail or other)
+            string errorMessage = null;
+
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Add("authorization", $"Bearer {apiKey}");
@@ -445,17 +494,35 @@ namespace StableDiffusionWinForms
 
                 var response = await httpClient.GetAsync($"https://api.stability.ai/v2beta/stable-image/upscale/creative/result/{generationId}");
 
+                // Get status code number
+                int statusCodeNumber = (int)response.StatusCode;
+
                 if (response.IsSuccessStatusCode)
                 {
-                    var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                    using (var ms = new MemoryStream(imageBytes))
+                    if (statusCodeNumber == 200)
                     {
-                        return Image.FromStream(ms);
+                        var imageBytes = await response.Content.ReadAsByteArrayAsync();
+                        using (var ms = new MemoryStream(imageBytes))
+                            {
+                                return (true, Image.FromStream(ms), errorMessage);
+                            }
                     }
+                    else if (statusCodeNumber == 202)
+                    {
+                        // The image is still being generated, so we can skip this one
+                        return (false, null, errorMessage);
+                    }
+                
+                else
+                {
+                    string errorDetails = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error: {response.StatusCode} - {errorDetails}");
+                    // Display the error message to user
+                    MessageBox.Show($"Failed to download upscaled image with Generation ID: {generationId}\n\nError Details: {errorDetails}");
                 }
             }
-
-            return null;
+            errorMessage = "Something unexpected happened. Please try again.";
+            return (false, null, errorMessage);
         }
 
         private void SaveUpscaledImage(string generationId, Image upscaledImage)
