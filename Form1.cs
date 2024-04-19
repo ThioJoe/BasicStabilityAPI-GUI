@@ -14,13 +14,16 @@ namespace StableDiffusionWinForms
 {
     public partial class Form1 : Form
     {
-        private const string ApiKey = "YOUR_API_KEY";
         private const string OutputFolder = "Image Outputs";
         private const string UpscaleOutputFolder = "Upscale Outputs";
 
         public Form1()
         {
             InitializeComponent();
+            cmbOutputFormat.SelectedIndex = 0; // Set the default output format to PNG
+            cmbUpscaleOutputFormat.SelectedIndex = 0; // Set the default output format to PNG
+            cmbAspectRatio.SelectedIndex = 0; // Set the default aspect ratio to 1:1
+            cmbModel.SelectedIndex = 0; // Set the default model to "sd3"
         }
 
         private const string ApiKeyFileName = "stability_key.txt";
@@ -31,7 +34,7 @@ namespace StableDiffusionWinForms
             {
                 // Create an empty file if it doesn't exist
                 File.WriteAllText(ApiKeyFileName, "");
-                ShowError($"Missing API key. Add API key to {ApiKeyFileName}.");
+                ShowError($"Missing or Invalid API key. Add API key to {ApiKeyFileName}.");
                 return "";
             }
 
@@ -44,6 +47,7 @@ namespace StableDiffusionWinForms
 
                 // Check if the line starts with "sk-"
                 if (line.StartsWith("sk-"))
+                    HideError(); // Hide the error message if a valid API key is found
                     return line.Trim();
             }
 
@@ -59,7 +63,10 @@ namespace StableDiffusionWinForms
             lblError.Visible = true; // Ensure the label is visible if it was previously hidden
         }
 
-
+        private void HideError()
+        {
+            lblError.Visible = false;  // Hide the error label
+        }
 
         private void SaveApiKey(string apiKey)
         {
@@ -71,7 +78,7 @@ namespace StableDiffusionWinForms
             string apiKey = LoadApiKey();
             if (!string.IsNullOrEmpty(apiKey))
             {
-                lblApiKeyStatus.Text = "Saved";
+                lblApiKeyStatus.Text = "API Key Loaded.";
             }
         }
 
@@ -81,8 +88,16 @@ namespace StableDiffusionWinForms
             if (!string.IsNullOrEmpty(apiKey))
             {
                 SaveApiKey(apiKey);
-                lblApiKeyStatus.Text = "Saved";
-                txtApiKey.Clear();
+                string savedApiKey = LoadApiKey();
+                if (apiKey == savedApiKey)
+                {
+                    lblApiKeyStatus.Text = "Saved";
+                    txtApiKey.Clear();
+                }
+                else
+                {
+                    lblApiKeyStatus.Text = "Problem while saving API key.";
+                }
             }
         }
 
@@ -96,6 +111,13 @@ namespace StableDiffusionWinForms
             int seed = (int)nudSeed.Value;
             string mode = "text-to-image";
             string outputFormat = cmbOutputFormat.SelectedItem.ToString();
+
+            // Validation Checks
+            if (string.IsNullOrWhiteSpace(prompt))
+            {
+                MessageBox.Show("Error: No prompt text entered.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit the function if the prompt is empty
+            }
 
 
             var imageParams = new Dictionary<string, object>
@@ -225,14 +247,45 @@ namespace StableDiffusionWinForms
             previewForm.ShowDialog();
         }
 
+        private string TrimQuotes(string input)
+        {
+            if (input.StartsWith("\"") && input.EndsWith("\"") && input.Length > 1)
+            {
+                return input.Substring(1, input.Length - 2);
+            }
+            else if (input.StartsWith("'") && input.EndsWith("'") && input.Length > 1)
+            {
+                return input.Substring(1, input.Length - 2);
+            }
+            return input;
+        }
+
+
         private async void btnUpscale_Click(object sender, EventArgs e)
         {
-            string imagePath = txtImagePath.Text;
+            string imagePath = TrimQuotes(txtImagePath.Text.Trim()); // Clean and trim the input path
             string prompt = txtUpscalePrompt.Text;
             int seed = (int)nudUpscaleSeed.Value;
             string negativePrompt = txtUpscaleNegativePrompt.Text;
             string outputFormat = cmbUpscaleOutputFormat.SelectedItem.ToString();
             double creativity = (double)nudUpscaleCreativity.Value;
+
+            // Validation Checks for empty required boxes
+            if (string.IsNullOrWhiteSpace(prompt))
+            {
+                MessageBox.Show("Error: No prompt text entered.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit the function if the prompt is empty
+            }
+            if (string.IsNullOrWhiteSpace(imagePath))
+            {
+                MessageBox.Show("Error: No existing image path entered.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit the function if the prompt is empty
+            }
+            if (!File.Exists(imagePath))
+            {
+                MessageBox.Show("Error: The provided image file path does not seem to exist, please check it.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; // Exit the function if the prompt is empty
+            }
 
             var imageParams = new Dictionary<string, object>
             {
