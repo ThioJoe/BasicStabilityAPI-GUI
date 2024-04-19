@@ -424,40 +424,56 @@ namespace StableDiffusionWinForms
                 UpscaleStatusLabel.Text = $"Downloading {undownloadedGenerationIds.Count()} images...";
                 UpscaleStatusLabel.Refresh(); // Optionally force the label to refresh the display
 
-                // List to store the generation IDs of images that failed to download
                 var failedGenerationIds = new List<string>();
+                var stillProcessingIds = new List<string>();
+                var errorMessages = new Dictionary<string, string>(); // Dictionary to keep track of error messages
 
                 foreach (var generationId in undownloadedGenerationIds)
                 {
                     var (success, upscaledImage, message) = await GetUpscaledImageAsync(generationId, apiKey);
-                    if (upscaledImage != null)
+                    if (success && upscaledImage != null)
                     {
                         SaveUpscaledImage(generationId, upscaledImage);
                         UpdateLogFile(logFilePath, generationId);
                     }
+                    else if (!success && message.Contains("still being generated"))
+                    {
+                        stillProcessingIds.Add(generationId);
+                        errorMessages[generationId] = null;
+                    }
                     else
                     {
-                        // If the image download fails, we can skip updating the log file. Record which images failed then display after all downloads are attempted
                         failedGenerationIds.Add(generationId);
-                        continue;
+                        errorMessages[generationId] = message; // Store the error message for this generation ID
                     }
                 }
+
                 UpscaleStatusLabel.Visible = false; // Hide the status label after response comes back, whether success or failure
-                // Show a message box to indicate the completion of the download process and any errors
+
+                // Build the message box contents based on the operation results
+                string resultMessage = $"Downloaded {undownloadedGenerationIds.Count - failedGenerationIds.Count - stillProcessingIds.Count} images successfully.";
                 if (failedGenerationIds.Any())
                 {
-                    MessageBox.Show($"Downloaded {undownloadedGenerationIds.Count - failedGenerationIds.Count} images successfully.\n\nFailed to download images with Generation IDs:\n{string.Join("\n  ", failedGenerationIds)}");
+                    resultMessage += $"\n\nGeneration IDs that failed for other reasons:\n";
+                    foreach (var id in failedGenerationIds)
+                    {
+                        resultMessage += $"{id}: {errorMessages[id]}\n"; // Include the specific error message for each failed ID
+                    }
                 }
-                else
+                if (stillProcessingIds.Any())
                 {
-                    MessageBox.Show("All images downloaded successfully.");
+                    resultMessage += $"\n\nGeneration IDs Still Processing:\n{string.Join("\n", stillProcessingIds)}";
                 }
-             }
+
+                MessageBox.Show(resultMessage);
+            }
             else
             {
                 MessageBox.Show("All upscaled images had already been downloaded, so none were downloaded now.");
             }
         }
+
+
 
         private List<string> GetUndownloadedGenerationIds(string logFilePath)
         {
@@ -510,6 +526,7 @@ namespace StableDiffusionWinForms
                     else if (statusCodeNumber == 202)
                     {
                         // The image is still being generated, so we can skip this one
+                        errorMessage = $"Image ID: {generationId} is still being generated.";
                         return (false, null, errorMessage);
                     }
                 }
