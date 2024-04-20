@@ -271,9 +271,11 @@ namespace StableDiffusionWinForms
         public void DisplayImagesInWindow(List<byte[]> imageDataList)
         {
             // Create a new form to display images. This serves as a container for our image layout.
-            Form previewForm = new Form();
-            previewForm.Text = "Generated Images"; // Set the window title.
-            previewForm.ClientSize = new Size(800, 600); // Set the size of the window to 800x600 pixels.
+            Form previewForm = new Form
+            {
+                Text = "Generated Images", // Set the window title.
+                ClientSize = new Size(800, 600) // Set the size of the window to 800x600 pixels.
+            };
 
             // Calculate the average dimensions of all images to determine the best layout.
             var (averageWidth, averageHeight) = CalculateAverageDimensions(imageDataList);
@@ -281,10 +283,12 @@ namespace StableDiffusionWinForms
             var (rows, columns) = CalculateGridDimensions(imageDataList.Count, averageWidth, averageHeight);
 
             // Create a TableLayoutPanel which will organize images in a grid layout.
-            TableLayoutPanel tableLayoutPanel = new TableLayoutPanel();
-            tableLayoutPanel.Dock = DockStyle.Fill; // Make the panel fill its parent container.
-            tableLayoutPanel.RowCount = rows; // Set the number of rows in the grid.
-            tableLayoutPanel.ColumnCount = columns; // Set the number of columns in the grid.
+            TableLayoutPanel tableLayoutPanel = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill, // Make the panel fill its parent container.
+                RowCount = rows, // Set the number of rows in the grid.
+                ColumnCount = columns // Set the number of columns in the grid.
+            };
 
             // Configure the layout of rows and columns to equally distribute space among them.
             // This loop sets up the style for each row in the TableLayoutPanel.
@@ -314,11 +318,13 @@ namespace StableDiffusionWinForms
                 using (var ms = new MemoryStream(imageData))
                 {
                     Image image = Image.FromStream(ms); // Load the image from its byte array.
-                    PictureBox pictureBox = new PictureBox();
-                    pictureBox.Image = image; // Assign the image to the PictureBox.
-                    pictureBox.SizeMode = PictureBoxSizeMode.Zoom; // Set image mode to zoom.
-                    pictureBox.Dock = DockStyle.Fill; // Make the PictureBox fill its allocated cell in the grid.
-                    pictureBox.Margin = new Padding(5); // Set a margin around the PictureBox for spacing.
+                    PictureBox pictureBox = new PictureBox
+                    {
+                        Image = image, // Assign the image to the PictureBox.
+                        SizeMode = PictureBoxSizeMode.Zoom, // Set image mode to zoom.
+                        Dock = DockStyle.Fill, // Make the PictureBox fill its allocated cell in the grid.
+                        Margin = new Padding(5) // Set a margin around the PictureBox for spacing.
+                    };
                     tableLayoutPanel.Controls.Add(pictureBox); // Add the PictureBox to the grid.
                 }
             }
