@@ -300,11 +300,13 @@ namespace StableDiffusionWinForms
             tableLayoutPanel.RowCount = rows;
             tableLayoutPanel.ColumnCount = columns;
 
-            // Configure rows and columns
+            // Configure rows and columns to have absolute sizes rather than percentages
+            tableLayoutPanel.RowStyles.Clear();
+            tableLayoutPanel.ColumnStyles.Clear();
             for (int i = 0; i < rows; i++)
-                tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F / rows));
+                tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             for (int j = 0; j < columns; j++)
-                tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F / columns));
+                tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
             foreach (byte[] imageData in imageDataList)
             {
@@ -314,15 +316,16 @@ namespace StableDiffusionWinForms
                     PictureBox pictureBox = new PictureBox();
                     pictureBox.Image = image;
                     pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-                    pictureBox.Dock = DockStyle.Fill;
-                    pictureBox.Margin = new Padding(5);
-                    tableLayoutPanel.Controls.Add(pictureBox);
+                    pictureBox.Anchor = AnchorStyles.Top | AnchorStyles.Left; // Anchor images to the top-left of each cell
+                    pictureBox.Margin = new Padding(0); // Set margin to 0 to reduce space between images
+                    tableLayoutPanel.Controls.Add(pictureBox, tableLayoutPanel.Controls.Count % columns, tableLayoutPanel.Controls.Count / columns);
                 }
             }
 
             previewForm.Controls.Add(tableLayoutPanel);
             previewForm.ShowDialog();
         }
+
 
 
 
