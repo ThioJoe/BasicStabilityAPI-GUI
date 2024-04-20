@@ -18,4 +18,7 @@ This repository contains an unofficial set of Python scripts to interact with th
  - Automatically retrieve and download upscaled images
 - Uses log file which details and tracks downloaded/undownloaded images
 
-## Example of Post-Generation Preview Window
+## Screenshots
+<img width="550" alt="Window Screenshot" src="https://github.com/ThioJoe/BasicStabilityAPI-GUI/assets/12518330/23190559-b8b2-4add-a73c-002d414fc498">
+
+<img width="550" alt="Preview Window" src="https://github.com/ThioJoe/BasicStabilityAPI-GUI/assets/12518330/48be20a2-81ac-4781-a9d7-5a52e559669a">
