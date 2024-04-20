@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.txtPrompt = new System.Windows.Forms.TextBox();
             this.txtNegativePrompt = new System.Windows.Forms.TextBox();
             this.nudImageCount = new System.Windows.Forms.NumericUpDown();
@@ -571,6 +572,7 @@
             this.Controls.Add(this.txtApiKey);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel3);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.Text = "Stable Diffusion 3";
