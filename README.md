@@ -14,9 +14,13 @@ This repository contains an unofficial set of Python scripts to interact with th
  - Preview generated images in a dedicated window
 
 **Upscale existing images using the Stability AI API:**
- - Initiate upscaling requests with customizable parameters
- - Automatically retrieve and download upscaled images
+- Initiate upscaling requests with customizable parameters
+- Automatically retrieve and download upscaled images
 - Uses log file which details and tracks downloaded/undownloaded images
+
+**Other Notable Features**:
+- Release executables signed with [EV code signing certificate](https://en.wikipedia.org/wiki/Extended_Validation_Certificate) (No pop up from Windows about untrusted software)
+- Automatic loading of API key from text file after you enter it the first time
 
 ## Screenshots
 <img width="550" alt="Window Screenshot" src="https://github.com/ThioJoe/BasicStabilityAPI-GUI/assets/12518330/23190559-b8b2-4add-a73c-002d414fc498">
