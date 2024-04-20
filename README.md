@@ -9,20 +9,20 @@ This repository contains an unofficial set of Python scripts to interact with th
  - Control the number of images to generate
  - Choose between SD3 and SD3-Turbo models
  - Set the aspect ratio of generated images
- - Use deterministic seeds for reproducibility
+ - Manually specify seed or use 0 for random
  - Select the output format (PNG, JPEG, WEBP)
- - Preview generated images in a user-friendly window
+ - Preview generated images in a dedicated window
 
 **Upscale existing images using the Stability AI API:**
  - Initiate upscaling requests with customizable parameters
  - Automatically retrieve and download upscaled images
 - Uses log file which details and tracks downloaded/undownloaded images
 
-### Requirements:
-- A stability AI API key is required. You can read some instructions here: https://platform.stability.ai/docs/getting-started
-- If you already have an account you can find your API key in your account settings here: https://platform.stability.ai/account/keys
-
 ## Screenshots
 <img width="550" alt="Window Screenshot" src="https://github.com/ThioJoe/BasicStabilityAPI-GUI/assets/12518330/23190559-b8b2-4add-a73c-002d414fc498">
 
 <img width="550" alt="Preview Window" src="https://github.com/ThioJoe/BasicStabilityAPI-GUI/assets/12518330/48be20a2-81ac-4781-a9d7-5a52e559669a">
+
+## Requirement - API Key:
+- A stability AI API key is required. You can read some instructions here: https://platform.stability.ai/docs/getting-started
+- If you already have an account you can find your API key in your account settings here: https://platform.stability.ai/account/keys
