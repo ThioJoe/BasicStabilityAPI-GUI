@@ -139,14 +139,16 @@ namespace StableDiffusionWinForms
             GenerationStatusLabel.ForeColor = Color.Blue;
             GenerationStatusLabel.Visible = true;
 
-            var generatedImages = await GenerateImagesAsync(apiKey, imageParams, imageCount);
+            var imageDataList = await GenerateImagesAsync(apiKey, imageParams, imageCount);
 
             GenerationStatusLabel.Visible = false; // Hide the status label after response comes back, whether success or failure
 
-            if (generatedImages != null && generatedImages.Any())
+            if (imageDataList != null && imageDataList.Any())
             {
-                SaveImagesToFile(generatedImages, (string)imageParams["output_format"], OutputFolder);
-                DisplayImagesInWindow(generatedImages);
+                List<string> filenames = GenerateFilenames(imageCount, model, outputFormat);
+                SaveImagesToFile(imageDataList, filenames, OutputFolder);
+                LogGenerationRequest(prompt, negativePrompt, filenames, imageDataList.Select(detail => (string)detail["Seed"]).ToList());
+                DisplayImagesInWindow(imageDataList.Select(detail => (byte[])detail["ImageData"]).ToList());
             }
             else
             {
@@ -154,9 +156,46 @@ namespace StableDiffusionWinForms
             }
         }
 
-        private async Task<List<byte[]>> GenerateImagesAsync(string apiKey, Dictionary<string, object> imageParams, int imageCount)
+        private List<string> GenerateFilenames(int imageCount, string model, string outputFormat)
         {
-            var generatedImagesData = new List<byte[]>();
+            List<string> filenames = new List<string>();
+            string timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
+            string fileExtension = outputFormat.Equals("jpeg", StringComparison.OrdinalIgnoreCase) ? ".jpeg" : ".png";
+
+            for (int i = 0; i < imageCount; i++)
+            {
+                string filename = $"{model}_{timestamp}_{i}{fileExtension}";
+                filenames.Add(filename);
+            }
+
+            return filenames;
+        }
+
+        private void LogGenerationRequest(string prompt, string negativePrompt, List<string> filenames, List<string> seeds)
+        {
+            string logFilePath = Path.Combine(OutputFolder, "Image_Generation_Log.txt");
+            if (!Directory.Exists(OutputFolder))
+            {
+                Directory.CreateDirectory(OutputFolder);
+            }
+
+            StringBuilder logEntry = new StringBuilder();
+
+            for (int i = 0; i < filenames.Count; i++)
+            {
+                logEntry.AppendLine($"{filenames[i]}:");
+                logEntry.AppendLine($"\tPrompt:\t\t\t{prompt.Trim()}");
+                logEntry.AppendLine($"\tNegative Prompt:\t{negativePrompt.Trim()}");
+                logEntry.AppendLine($"\tSeed:\t\t\t{seeds[i]}");
+                logEntry.AppendLine(); // Adds an extra newline for spacing between entries
+            }
+
+            File.AppendAllText(logFilePath, logEntry.ToString());
+        }
+
+        private async Task<List<Dictionary<string, object>>> GenerateImagesAsync(string apiKey, Dictionary<string, object> imageParams, int imageCount)
+        {
+            var imageDataList = new List<Dictionary<string, object>>();
 
             using (var httpClient = new HttpClient())
             {
@@ -189,10 +228,18 @@ namespace StableDiffusionWinForms
 
                 foreach (var response in responses)
                 {
+                    var imageData = new Dictionary<string, object>();
                     if (response.IsSuccessStatusCode)
                     {
+                        
                         var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                        generatedImagesData.Add(imageBytes);
+                        imageData.Add("ImageData", imageBytes);
+
+                        // Extract seed from headers
+                        string seedValue = response.Headers.GetValues("seed").FirstOrDefault();
+                        imageData.Add("Seed", seedValue);  // Keep it as a string
+
+                        imageDataList.Add(imageData);
                     }
                     else
                     {
@@ -203,7 +250,7 @@ namespace StableDiffusionWinForms
                 }
             }
 
-            return generatedImagesData;
+            return imageDataList;
         }
 
 
@@ -222,24 +269,18 @@ namespace StableDiffusionWinForms
         }
 
 
-        private void SaveImagesToFile(List<byte[]> imageDatas, string outputFormat, string outputFolder)
+        private void SaveImagesToFile(List<Dictionary<string, object>> imageDataList, List<string> filenames, string outputFolder)
         {
             if (!Directory.Exists(outputFolder))
             {
                 Directory.CreateDirectory(outputFolder);
             }
 
-            int counter = 1;
-            string timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
-
-            foreach (var imageData in imageDatas)
+            for (int i = 0; i < imageDataList.Count; i++)
             {
-                string fileExtension = outputFormat.Equals("jpeg", StringComparison.OrdinalIgnoreCase) ? ".jpeg" : ".png";
-                string filename = $"Image_{timestamp}_{counter}{fileExtension}";
-                string filePath = Path.Combine(outputFolder, filename);
-
-                SaveImageBytesToFile(imageData, filePath);
-                counter++;
+                var imageData = (byte[])imageDataList[i]["ImageData"];
+                string filePath = Path.Combine(outputFolder, filenames[i]);
+                File.WriteAllBytes(filePath, imageData);
             }
         }
 
