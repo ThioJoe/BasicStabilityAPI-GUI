@@ -463,7 +463,7 @@ namespace StableDiffusionWinForms
             if (!string.IsNullOrEmpty(generationId))
             {
                 LogUpscaleRequest(generationId, imagePath, imageParams);
-                MessageBox.Show($"Upscale request sent. Generation ID: {generationId}");
+                MessageBox.Show($"Upscale request sent. Generation ID:\n{generationId}\n\nWait a short while for it to process, then click the other button to download the result.");
             }
             else
             {
@@ -581,7 +581,7 @@ namespace StableDiffusionWinForms
                         SaveUpscaledImage(generationId, upscaledImageData);
                         UpdateLogFile(logFilePath, generationId);
                     }
-                    else if (!success && message.Contains("still being generated"))
+                    else if (!success && message.Contains("still being processed"))
                     {
                         stillProcessingIds.Add(generationId);
                         errorMessages[generationId] = null;
