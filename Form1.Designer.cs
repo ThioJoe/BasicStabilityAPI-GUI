@@ -67,6 +67,8 @@
             this.lblError = new System.Windows.Forms.Label();
             this.GenerationStatusLabel = new System.Windows.Forms.Label();
             this.UpscaleStatusLabel = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel3 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.nudImageCount)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudSeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudUpscaleSeed)).BeginInit();
@@ -75,7 +77,7 @@
             // 
             // txtPrompt
             // 
-            this.txtPrompt.Location = new System.Drawing.Point(10, 135);
+            this.txtPrompt.Location = new System.Drawing.Point(27, 135);
             this.txtPrompt.Multiline = true;
             this.txtPrompt.Name = "txtPrompt";
             this.txtPrompt.Size = new System.Drawing.Size(300, 60);
@@ -83,7 +85,7 @@
             // 
             // txtNegativePrompt
             // 
-            this.txtNegativePrompt.Location = new System.Drawing.Point(10, 224);
+            this.txtNegativePrompt.Location = new System.Drawing.Point(27, 224);
             this.txtNegativePrompt.Multiline = true;
             this.txtNegativePrompt.Name = "txtNegativePrompt";
             this.txtNegativePrompt.Size = new System.Drawing.Size(300, 60);
@@ -91,7 +93,7 @@
             // 
             // nudImageCount
             // 
-            this.nudImageCount.Location = new System.Drawing.Point(10, 302);
+            this.nudImageCount.Location = new System.Drawing.Point(27, 302);
             this.nudImageCount.Minimum = new decimal(new int[] {
             1,
             0,
@@ -113,7 +115,7 @@
             this.cmbModel.Items.AddRange(new object[] {
             "SD3",
             "SD3-Turbo"});
-            this.cmbModel.Location = new System.Drawing.Point(11, 339);
+            this.cmbModel.Location = new System.Drawing.Point(28, 339);
             this.cmbModel.Name = "cmbModel";
             this.cmbModel.Size = new System.Drawing.Size(120, 21);
             this.cmbModel.TabIndex = 3;
@@ -132,14 +134,14 @@
             "5:4",
             "9:16",
             "9:21"});
-            this.cmbAspectRatio.Location = new System.Drawing.Point(137, 339);
+            this.cmbAspectRatio.Location = new System.Drawing.Point(154, 339);
             this.cmbAspectRatio.Name = "cmbAspectRatio";
             this.cmbAspectRatio.Size = new System.Drawing.Size(120, 21);
             this.cmbAspectRatio.TabIndex = 4;
             // 
             // nudSeed
             // 
-            this.nudSeed.Location = new System.Drawing.Point(10, 378);
+            this.nudSeed.Location = new System.Drawing.Point(27, 378);
             this.nudSeed.Maximum = new decimal(new int[] {
             2147483647,
             0,
@@ -156,14 +158,14 @@
             this.cmbOutputFormat.Items.AddRange(new object[] {
             "png",
             "jpeg"});
-            this.cmbOutputFormat.Location = new System.Drawing.Point(136, 378);
+            this.cmbOutputFormat.Location = new System.Drawing.Point(153, 378);
             this.cmbOutputFormat.Name = "cmbOutputFormat";
             this.cmbOutputFormat.Size = new System.Drawing.Size(120, 21);
             this.cmbOutputFormat.TabIndex = 6;
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(10, 406);
+            this.btnGenerate.Location = new System.Drawing.Point(27, 406);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(120, 23);
             this.btnGenerate.TabIndex = 7;
@@ -265,7 +267,7 @@
             // lblPrompt
             // 
             this.lblPrompt.AutoSize = true;
-            this.lblPrompt.Location = new System.Drawing.Point(9, 118);
+            this.lblPrompt.Location = new System.Drawing.Point(26, 118);
             this.lblPrompt.Name = "lblPrompt";
             this.lblPrompt.Size = new System.Drawing.Size(43, 13);
             this.lblPrompt.TabIndex = 16;
@@ -274,7 +276,7 @@
             // lblNegativePrompt
             // 
             this.lblNegativePrompt.AutoSize = true;
-            this.lblNegativePrompt.Location = new System.Drawing.Point(9, 207);
+            this.lblNegativePrompt.Location = new System.Drawing.Point(26, 207);
             this.lblNegativePrompt.Name = "lblNegativePrompt";
             this.lblNegativePrompt.Size = new System.Drawing.Size(89, 13);
             this.lblNegativePrompt.TabIndex = 17;
@@ -283,7 +285,7 @@
             // lblImageCount
             // 
             this.lblImageCount.AutoSize = true;
-            this.lblImageCount.Location = new System.Drawing.Point(10, 285);
+            this.lblImageCount.Location = new System.Drawing.Point(27, 285);
             this.lblImageCount.Name = "lblImageCount";
             this.lblImageCount.Size = new System.Drawing.Size(70, 13);
             this.lblImageCount.TabIndex = 18;
@@ -292,7 +294,7 @@
             // lblModel
             // 
             this.lblModel.AutoSize = true;
-            this.lblModel.Location = new System.Drawing.Point(10, 323);
+            this.lblModel.Location = new System.Drawing.Point(27, 323);
             this.lblModel.Name = "lblModel";
             this.lblModel.Size = new System.Drawing.Size(39, 13);
             this.lblModel.TabIndex = 19;
@@ -301,7 +303,7 @@
             // lblAspectRatio
             // 
             this.lblAspectRatio.AutoSize = true;
-            this.lblAspectRatio.Location = new System.Drawing.Point(136, 323);
+            this.lblAspectRatio.Location = new System.Drawing.Point(153, 323);
             this.lblAspectRatio.Name = "lblAspectRatio";
             this.lblAspectRatio.Size = new System.Drawing.Size(71, 13);
             this.lblAspectRatio.TabIndex = 20;
@@ -310,7 +312,7 @@
             // lblSeed
             // 
             this.lblSeed.AutoSize = true;
-            this.lblSeed.Location = new System.Drawing.Point(9, 361);
+            this.lblSeed.Location = new System.Drawing.Point(26, 361);
             this.lblSeed.Name = "lblSeed";
             this.lblSeed.Size = new System.Drawing.Size(35, 13);
             this.lblSeed.TabIndex = 21;
@@ -319,7 +321,7 @@
             // lblOutputFormat
             // 
             this.lblOutputFormat.AutoSize = true;
-            this.lblOutputFormat.Location = new System.Drawing.Point(136, 361);
+            this.lblOutputFormat.Location = new System.Drawing.Point(153, 361);
             this.lblOutputFormat.Name = "lblOutputFormat";
             this.lblOutputFormat.Size = new System.Drawing.Size(77, 13);
             this.lblOutputFormat.TabIndex = 22;
@@ -383,7 +385,7 @@
             // 
             this.TextToImageTitleLabel.AutoSize = true;
             this.TextToImageTitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextToImageTitleLabel.Location = new System.Drawing.Point(38, 74);
+            this.TextToImageTitleLabel.Location = new System.Drawing.Point(52, 74);
             this.TextToImageTitleLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.TextToImageTitleLabel.Name = "TextToImageTitleLabel";
             this.TextToImageTitleLabel.Size = new System.Drawing.Size(237, 26);
@@ -404,17 +406,17 @@
             // MainTitleLabel
             // 
             this.MainTitleLabel.AutoSize = true;
-            this.MainTitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MainTitleLabel.Location = new System.Drawing.Point(154, 19);
+            this.MainTitleLabel.Font = new System.Drawing.Font("Bahnschrift Condensed", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MainTitleLabel.Location = new System.Drawing.Point(11, 9);
             this.MainTitleLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.MainTitleLabel.Name = "MainTitleLabel";
-            this.MainTitleLabel.Size = new System.Drawing.Size(400, 37);
+            this.MainTitleLabel.Size = new System.Drawing.Size(287, 39);
             this.MainTitleLabel.TabIndex = 31;
             this.MainTitleLabel.Text = "Stable Diffusion 3 API Tool";
             // 
             // txtApiKey
             // 
-            this.txtApiKey.Location = new System.Drawing.Point(10, 453);
+            this.txtApiKey.Location = new System.Drawing.Point(10, 462);
             this.txtApiKey.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtApiKey.Name = "txtApiKey";
             this.txtApiKey.Size = new System.Drawing.Size(201, 20);
@@ -422,7 +424,7 @@
             // 
             // btnSaveApiKey
             // 
-            this.btnSaveApiKey.Location = new System.Drawing.Point(214, 450);
+            this.btnSaveApiKey.Location = new System.Drawing.Point(214, 459);
             this.btnSaveApiKey.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSaveApiKey.Name = "btnSaveApiKey";
             this.btnSaveApiKey.Size = new System.Drawing.Size(50, 24);
@@ -435,7 +437,7 @@
             // 
             this.lblApiKeyStatus.AutoSize = true;
             this.lblApiKeyStatus.ForeColor = System.Drawing.Color.Green;
-            this.lblApiKeyStatus.Location = new System.Drawing.Point(272, 457);
+            this.lblApiKeyStatus.Location = new System.Drawing.Point(272, 466);
             this.lblApiKeyStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblApiKeyStatus.Name = "lblApiKeyStatus";
             this.lblApiKeyStatus.Size = new System.Drawing.Size(0, 13);
@@ -444,7 +446,7 @@
             // ApiKeyLabel
             // 
             this.ApiKeyLabel.AutoSize = true;
-            this.ApiKeyLabel.Location = new System.Drawing.Point(9, 436);
+            this.ApiKeyLabel.Location = new System.Drawing.Point(9, 445);
             this.ApiKeyLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.ApiKeyLabel.Name = "ApiKeyLabel";
             this.ApiKeyLabel.Size = new System.Drawing.Size(45, 13);
@@ -454,7 +456,7 @@
             // lblError
             // 
             this.lblError.AutoSize = true;
-            this.lblError.Location = new System.Drawing.Point(272, 457);
+            this.lblError.Location = new System.Drawing.Point(272, 466);
             this.lblError.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblError.Name = "lblError";
             this.lblError.Size = new System.Drawing.Size(29, 13);
@@ -465,7 +467,7 @@
             // GenerationStatusLabel
             // 
             this.GenerationStatusLabel.AutoSize = true;
-            this.GenerationStatusLabel.Location = new System.Drawing.Point(133, 411);
+            this.GenerationStatusLabel.Location = new System.Drawing.Point(150, 411);
             this.GenerationStatusLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.GenerationStatusLabel.Name = "GenerationStatusLabel";
             this.GenerationStatusLabel.Size = new System.Drawing.Size(115, 13);
@@ -484,11 +486,27 @@
             this.UpscaleStatusLabel.Text = "UpscaleStatusLabel";
             this.UpscaleStatusLabel.Visible = false;
             // 
+            // panel1
+            // 
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Location = new System.Drawing.Point(370, 60);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(328, 422);
+            this.panel1.TabIndex = 36;
+            // 
+            // panel3
+            // 
+            this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel3.Location = new System.Drawing.Point(12, 60);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(326, 382);
+            this.panel3.TabIndex = 37;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(733, 485);
+            this.ClientSize = new System.Drawing.Size(714, 500);
             this.Controls.Add(this.UpscaleStatusLabel);
             this.Controls.Add(this.GenerationStatusLabel);
             this.Controls.Add(this.lblError);
@@ -528,6 +546,8 @@
             this.Controls.Add(this.lblApiKeyStatus);
             this.Controls.Add(this.btnSaveApiKey);
             this.Controls.Add(this.txtApiKey);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panel3);
             this.Name = "Form1";
             this.Text = "Stable Diffusion 3";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -581,5 +601,7 @@
         private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Label GenerationStatusLabel;
         private System.Windows.Forms.Label UpscaleStatusLabel;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel3;
     }
 }
