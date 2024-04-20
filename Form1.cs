@@ -286,35 +286,128 @@ namespace StableDiffusionWinForms
         }
 
 
-        private void DisplayImagesInWindow(List<byte[]> imageDatas)
+        public void DisplayImagesInWindow(List<byte[]> imageDataList)
         {
-            var previewForm = new Form();
+            Form previewForm = new Form();
             previewForm.Text = "Generated Images";
             previewForm.ClientSize = new Size(800, 600);
 
-            var flowLayoutPanel = new FlowLayoutPanel();
-            flowLayoutPanel.Dock = DockStyle.Fill;
-            flowLayoutPanel.AutoScroll = true;
+            var (averageWidth, averageHeight) = CalculateAverageDimensions(imageDataList);
+            var (rows, columns) = CalculateGridDimensions(imageDataList.Count, averageWidth, averageHeight);
 
-            foreach (var imageData in imageDatas)
+            TableLayoutPanel tableLayoutPanel = new TableLayoutPanel();
+            tableLayoutPanel.Dock = DockStyle.Fill;
+            tableLayoutPanel.RowCount = rows;
+            tableLayoutPanel.ColumnCount = columns;
+
+            // Configure rows and columns
+            for (int i = 0; i < rows; i++)
+                tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F / rows));
+            for (int j = 0; j < columns; j++)
+                tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F / columns));
+
+            foreach (byte[] imageData in imageDataList)
             {
                 using (var ms = new MemoryStream(imageData))
                 {
-                    var image = Image.FromStream(ms);
-                    var pictureBox = new PictureBox();
+                    Image image = Image.FromStream(ms);
+                    PictureBox pictureBox = new PictureBox();
                     pictureBox.Image = image;
                     pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-                    pictureBox.Width = 200;
-                    pictureBox.Height = 200;
+                    pictureBox.Dock = DockStyle.Fill;
                     pictureBox.Margin = new Padding(5);
-
-                    flowLayoutPanel.Controls.Add(pictureBox);
+                    tableLayoutPanel.Controls.Add(pictureBox);
                 }
             }
 
-            previewForm.Controls.Add(flowLayoutPanel);
+            previewForm.Controls.Add(tableLayoutPanel);
             previewForm.ShowDialog();
         }
+
+
+
+
+        private void ResizeImages(FlowLayoutPanel panel, int imageCount)
+        {
+            // Get the available size per image, respecting both width and height
+            int availableWidth = panel.ClientSize.Width / imageCount - 10;  // -10 to account for margin
+            int availableHeight = panel.ClientSize.Height - 10;  // -10 to account for margin
+
+            foreach (Control control in panel.Controls)
+            {
+                if (control is PictureBox pictureBox)
+                {
+                    // Calculate the new size keeping the aspect ratio intact
+                    double imageAspectRatio = (double)pictureBox.Image.Width / pictureBox.Image.Height;
+                    int targetWidth = availableWidth;
+                    int targetHeight = (int)(availableWidth / imageAspectRatio);
+
+                    // Check if the calculated height is more than available height
+                    if (targetHeight > availableHeight)
+                    {
+                        // Adjust the width to fit the height
+                        targetHeight = availableHeight;
+                        targetWidth = (int)(availableHeight * imageAspectRatio);
+                    }
+
+                    pictureBox.Width = targetWidth;
+                    pictureBox.Height = targetHeight;
+                }
+            }
+        }
+
+        private (double averageWidth, double averageHeight) CalculateAverageDimensions(List<byte[]> imageDataList)
+        {
+            double totalWidth = 0, totalHeight = 0;
+            int count = 0;
+
+            foreach (byte[] imageData in imageDataList)
+            {
+                using (var ms = new MemoryStream(imageData))
+                {
+                    using (Image img = Image.FromStream(ms))
+                    {
+                        totalWidth += img.Width;
+                        totalHeight += img.Height;
+                        count++;
+                    }
+                }
+            }
+
+            return (totalWidth / count, totalHeight / count);
+        }
+
+        private (int rows, int columns) CalculateGridDimensions(int numImages, double averageWidth, double averageHeight)
+        {
+            double aspectRatio = averageWidth / averageHeight;
+            int grid_size = (int)Math.Ceiling(Math.Sqrt(numImages));
+            int rows, columns;
+
+            // Default square or nearly-square layout
+            if (numImages <= grid_size * (grid_size - 1))
+            {
+                rows = Math.Min(numImages, grid_size - 1);
+                columns = (int)Math.Ceiling((double)numImages / rows);
+            }
+            else
+            {
+                rows = columns = grid_size;
+            }
+
+            // Adjust the layout based on the average aspect ratio
+            if (aspectRatio > 1.5)
+            {
+                // More horizontal space, stack images horizontally
+                (rows, columns) = (columns, rows);
+            }
+
+            return (rows, columns);
+        }
+
+
+
+
+
 
 
         private string TrimQuotes(string input)
