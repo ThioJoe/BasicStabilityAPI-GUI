@@ -181,7 +181,7 @@
             this.btnGenerate.TabIndex = 7;
             this.btnGenerate.Text = "Generate";
             this.btnGenerate.UseVisualStyleBackColor = true;
-            this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
+            this.btnGenerate.Click += new System.EventHandler(this.BtnGenerate_Click);
             // 
             // txtImagePath
             // 
@@ -269,7 +269,7 @@
             this.btnUpscale.TabIndex = 14;
             this.btnUpscale.Text = "Upscale";
             this.btnUpscale.UseVisualStyleBackColor = true;
-            this.btnUpscale.Click += new System.EventHandler(this.btnUpscale_Click);
+            this.btnUpscale.Click += new System.EventHandler(this.BtnUpscale_Click);
             // 
             // btnDownloadUpscaledImages
             // 
@@ -280,7 +280,7 @@
             this.btnDownloadUpscaledImages.TabIndex = 15;
             this.btnDownloadUpscaledImages.Text = "Download Upscaled Images";
             this.btnDownloadUpscaledImages.UseVisualStyleBackColor = true;
-            this.btnDownloadUpscaledImages.Click += new System.EventHandler(this.btnDownloadUpscaledImages_Click);
+            this.btnDownloadUpscaledImages.Click += new System.EventHandler(this.BtnDownloadUpscaledImages_Click);
             // 
             // lblPrompt
             // 
@@ -457,7 +457,7 @@
             this.btnSaveApiKey.TabIndex = 30;
             this.btnSaveApiKey.Text = "Save";
             this.btnSaveApiKey.UseVisualStyleBackColor = true;
-            this.btnSaveApiKey.Click += new System.EventHandler(this.btnSaveApiKey_Click);
+            this.btnSaveApiKey.Click += new System.EventHandler(this.BtnSaveApiKey_Click);
             // 
             // lblApiKeyStatus
             // 

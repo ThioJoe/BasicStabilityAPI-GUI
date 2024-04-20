@@ -84,7 +84,7 @@ namespace StableDiffusionWinForms
             }
         }
 
-        private void btnSaveApiKey_Click(object sender, EventArgs e)
+        private void BtnSaveApiKey_Click(object sender, EventArgs e)
         {
             string apiKey = txtApiKey.Text.Trim();
             if (!string.IsNullOrEmpty(apiKey))
@@ -103,7 +103,7 @@ namespace StableDiffusionWinForms
             }
         }
 
-        private async void btnGenerate_Click(object sender, EventArgs e)
+        private async void BtnGenerate_Click(object sender, EventArgs e)
         {
             string prompt = txtPrompt.Text;
             string negativePrompt = txtNegativePrompt.Text;
@@ -253,22 +253,6 @@ namespace StableDiffusionWinForms
             return imageDataList;
         }
 
-
-        private void SaveBase64ImageToFile(string base64Image, string filePath)
-        {
-            // Convert base64 string to byte[]
-            byte[] imageBytes = Convert.FromBase64String(base64Image);
-
-            // Write byte array directly to file
-            File.WriteAllBytes(filePath, imageBytes);
-        }
-
-        private void SaveImageBytesToFile(byte[] imageBytes, string filePath)
-        {
-            File.WriteAllBytes(filePath, imageBytes);
-        }
-
-
         private void SaveImagesToFile(List<Dictionary<string, object>> imageDataList, List<string> filenames, string outputFolder)
         {
             if (!Directory.Exists(outputFolder))
@@ -283,49 +267,6 @@ namespace StableDiffusionWinForms
                 File.WriteAllBytes(filePath, imageData);
             }
         }
-
-
-        private void SaveImageWithFormat(Image image, string filePath, string outputFormat)
-        {
-            ImageFormat format = ImageFormat.Png; // Default to PNG
-            if (outputFormat.Equals("jpeg", StringComparison.OrdinalIgnoreCase))
-            {
-                format = ImageFormat.Jpeg;
-            }
-
-            if (format == ImageFormat.Jpeg)
-            {
-                // Create encoder parameters with high quality
-                EncoderParameters encoderParams = new EncoderParameters(1);
-                encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 95L);  // Set the quality to 95
-
-                ImageCodecInfo jpegCodecInfo = GetEncoderInfo("image/jpeg");
-                if (jpegCodecInfo == null)
-                {
-                    throw new InvalidOperationException("JPEG codec not found.");
-                }
-
-                // Use the encoder info to save the image
-                image.Save(filePath, jpegCodecInfo, encoderParams);
-            }
-            else
-            {
-                image.Save(filePath, format);
-            }
-        }
-
-        // Helper method to get encoder info based on MIME type
-        private static ImageCodecInfo GetEncoderInfo(string mimeType)
-        {
-            var codecs = ImageCodecInfo.GetImageEncoders();
-            foreach (var codec in codecs)
-            {
-                if (codec.MimeType == mimeType)
-                    return codec;
-            }
-            return null;
-        }
-
 
         public void DisplayImagesInWindow(List<byte[]> imageDataList)
         {
@@ -455,7 +396,7 @@ namespace StableDiffusionWinForms
         }
 
 
-        private async void btnUpscale_Click(object sender, EventArgs e)
+        private async void BtnUpscale_Click(object sender, EventArgs e)
         {
             string imagePath = TrimQuotes(txtImagePath.Text.Trim()); // Clean and trim the input path
             string prompt = txtUpscalePrompt.Text;
@@ -591,7 +532,7 @@ namespace StableDiffusionWinForms
             File.AppendAllText(logFilePath, JsonConvert.SerializeObject(logEntry) + Environment.NewLine);
         }
 
-        private async void btnDownloadUpscaledImages_Click(object sender, EventArgs e)
+        private async void BtnDownloadUpscaledImages_Click(object sender, EventArgs e)
         {
             string logFilePath = Path.Combine(UpscaleOutputFolder, "ID_Filename_Log.txt");
 
