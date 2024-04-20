@@ -13,8 +13,8 @@ namespace StableDiffusionWinForms
         static void Main()
         {
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new TestingImagePreviewForm());  // Run the testing form as the main form
+            Application.SetCompatibleTextRenderingDefault(false); //Uncomment this line to run the program normally
+            //Application.Run(new TestingImagePreviewForm());  // Uncomment this line and comment to run the image preview test form
             Application.Run(new Form1());
         }
     }
