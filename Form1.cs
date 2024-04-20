@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -144,7 +145,7 @@ namespace StableDiffusionWinForms
 
             if (generatedImages != null && generatedImages.Any())
             {
-                SaveImagesToFile(generatedImages);
+                SaveImagesToFile(generatedImages, (string)imageParams["output_format"], OutputFolder);
                 DisplayImagesInWindow(generatedImages);
             }
             else
@@ -153,9 +154,9 @@ namespace StableDiffusionWinForms
             }
         }
 
-        private async Task<List<Image>> GenerateImagesAsync(string apiKey, Dictionary<string, object> imageParams, int imageCount)
+        private async Task<List<byte[]>> GenerateImagesAsync(string apiKey, Dictionary<string, object> imageParams, int imageCount)
         {
-            var generatedImages = new List<Image>();
+            var generatedImagesData = new List<byte[]>();
 
             using (var httpClient = new HttpClient())
             {
@@ -172,9 +173,7 @@ namespace StableDiffusionWinForms
                     foreach (var param in imageParams)
                     {
                         var stringContent = new StringContent(param.Value.ToString());
-                        // Explicitly set ContentType if necessary
                         stringContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("text/plain");
-                        // Explicitly create and set the ContentDisposition
                         stringContent.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("form-data")
                         {
                             Name = $"\"{param.Key}\""
@@ -193,11 +192,7 @@ namespace StableDiffusionWinForms
                     if (response.IsSuccessStatusCode)
                     {
                         var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                        using (var ms = new MemoryStream(imageBytes))
-                        {
-                            var image = Image.FromStream(ms);
-                            generatedImages.Add(image);
-                        }
+                        generatedImagesData.Add(imageBytes);
                     }
                     else
                     {
@@ -208,28 +203,90 @@ namespace StableDiffusionWinForms
                 }
             }
 
-            return generatedImages;
+            return generatedImagesData;
         }
 
 
-
-        private void SaveImagesToFile(List<Image> images)
+        private void SaveBase64ImageToFile(string base64Image, string filePath)
         {
-            if (!Directory.Exists(OutputFolder))
+            // Convert base64 string to byte[]
+            byte[] imageBytes = Convert.FromBase64String(base64Image);
+
+            // Write byte array directly to file
+            File.WriteAllBytes(filePath, imageBytes);
+        }
+
+        private void SaveImageBytesToFile(byte[] imageBytes, string filePath)
+        {
+            File.WriteAllBytes(filePath, imageBytes);
+        }
+
+
+        private void SaveImagesToFile(List<byte[]> imageDatas, string outputFormat, string outputFolder)
+        {
+            if (!Directory.Exists(outputFolder))
             {
-                Directory.CreateDirectory(OutputFolder);
+                Directory.CreateDirectory(outputFolder);
             }
 
-            foreach (var image in images)
+            int counter = 1;
+            string timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
+
+            foreach (var imageData in imageDatas)
             {
-                string timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
-                string filename = $"SD3_{timestamp}.png";
-                string filePath = Path.Combine(OutputFolder, filename);
-                image.Save(filePath);
+                string fileExtension = outputFormat.Equals("jpeg", StringComparison.OrdinalIgnoreCase) ? ".jpeg" : ".png";
+                string filename = $"Image_{timestamp}_{counter}{fileExtension}";
+                string filePath = Path.Combine(outputFolder, filename);
+
+                SaveImageBytesToFile(imageData, filePath);
+                counter++;
             }
         }
 
-        private void DisplayImagesInWindow(List<Image> images)
+
+        private void SaveImageWithFormat(Image image, string filePath, string outputFormat)
+        {
+            ImageFormat format = ImageFormat.Png; // Default to PNG
+            if (outputFormat.Equals("jpeg", StringComparison.OrdinalIgnoreCase))
+            {
+                format = ImageFormat.Jpeg;
+            }
+
+            if (format == ImageFormat.Jpeg)
+            {
+                // Create encoder parameters with high quality
+                EncoderParameters encoderParams = new EncoderParameters(1);
+                encoderParams.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 95L);  // Set the quality to 95
+
+                ImageCodecInfo jpegCodecInfo = GetEncoderInfo("image/jpeg");
+                if (jpegCodecInfo == null)
+                {
+                    throw new InvalidOperationException("JPEG codec not found.");
+                }
+
+                // Use the encoder info to save the image
+                image.Save(filePath, jpegCodecInfo, encoderParams);
+            }
+            else
+            {
+                image.Save(filePath, format);
+            }
+        }
+
+        // Helper method to get encoder info based on MIME type
+        private static ImageCodecInfo GetEncoderInfo(string mimeType)
+        {
+            var codecs = ImageCodecInfo.GetImageEncoders();
+            foreach (var codec in codecs)
+            {
+                if (codec.MimeType == mimeType)
+                    return codec;
+            }
+            return null;
+        }
+
+
+        private void DisplayImagesInWindow(List<byte[]> imageDatas)
         {
             var previewForm = new Form();
             previewForm.Text = "Generated Images";
@@ -239,21 +296,26 @@ namespace StableDiffusionWinForms
             flowLayoutPanel.Dock = DockStyle.Fill;
             flowLayoutPanel.AutoScroll = true;
 
-            foreach (var image in images)
+            foreach (var imageData in imageDatas)
             {
-                var pictureBox = new PictureBox();
-                pictureBox.Image = image;
-                pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
-                pictureBox.Width = 200;
-                pictureBox.Height = 200;
-                pictureBox.Margin = new Padding(5);
+                using (var ms = new MemoryStream(imageData))
+                {
+                    var image = Image.FromStream(ms);
+                    var pictureBox = new PictureBox();
+                    pictureBox.Image = image;
+                    pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+                    pictureBox.Width = 200;
+                    pictureBox.Height = 200;
+                    pictureBox.Margin = new Padding(5);
 
-                flowLayoutPanel.Controls.Add(pictureBox);
+                    flowLayoutPanel.Controls.Add(pictureBox);
+                }
             }
 
             previewForm.Controls.Add(flowLayoutPanel);
             previewForm.ShowDialog();
         }
+
 
         private string TrimQuotes(string input)
         {
