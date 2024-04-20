@@ -492,10 +492,10 @@ namespace StableDiffusionWinForms
 
                 foreach (var generationId in undownloadedGenerationIds)
                 {
-                    var (success, upscaledImage, message) = await GetUpscaledImageAsync(generationId, apiKey);
-                    if (success && upscaledImage != null)
+                    var (success, upscaledImageData, message) = await GetUpscaledImageAsync(generationId, apiKey);
+                    if (success && upscaledImageData != null)
                     {
-                        SaveUpscaledImage(generationId, upscaledImage);
+                        SaveUpscaledImage(generationId, upscaledImageData);
                         UpdateLogFile(logFilePath, generationId);
                     }
                     else if (!success && message.Contains("still being generated"))
@@ -537,6 +537,7 @@ namespace StableDiffusionWinForms
 
 
 
+
         private List<string> GetUndownloadedGenerationIds(string logFilePath)
         {
             var undownloadedGenerationIds = new List<string>();
@@ -560,9 +561,8 @@ namespace StableDiffusionWinForms
             return undownloadedGenerationIds;
         }
 
-        private async Task<(bool success, Image image, string message)> GetUpscaledImageAsync(string generationId, string apiKey)
+        private async Task<(bool success, byte[] imageData, string message)> GetUpscaledImageAsync(string generationId, string apiKey)
         {
-            // Will return tuple of bool (success/other), Image (if success), string (error message if fail or other)
             string errorMessage = null;
 
             using (var httpClient = new HttpClient())
@@ -572,23 +572,17 @@ namespace StableDiffusionWinForms
 
                 var response = await httpClient.GetAsync($"https://api.stability.ai/v2beta/stable-image/upscale/creative/result/{generationId}");
 
-                // Get status code number
-                int statusCodeNumber = (int)response.StatusCode;
-
                 if (response.IsSuccessStatusCode)
                 {
-                    if (statusCodeNumber == 200)
+                    if ((int)response.StatusCode == 200)
                     {
                         var imageBytes = await response.Content.ReadAsByteArrayAsync();
-                        using (var ms = new MemoryStream(imageBytes))
-                            {
-                                return (true, Image.FromStream(ms), errorMessage);
-                            }
+                        return (true, imageBytes, null);
                     }
-                    else if (statusCodeNumber == 202)
+                    else if ((int)response.StatusCode == 202)
                     {
                         // The image is still being generated, so we can skip this one
-                        errorMessage = $"Image ID: {generationId} is still being generated.";
+                        errorMessage = $"Image ID: {generationId} is still being processed.";
                         return (false, null, errorMessage);
                     }
                 }
@@ -596,30 +590,48 @@ namespace StableDiffusionWinForms
                 {
                     string errorDetails = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Error: {response.StatusCode} - {errorDetails}");
-                    // Display the error message to user
+                    // Optionally display the error message to the user
                     MessageBox.Show($"Failed to download upscaled image with Generation ID: {generationId}\n\nError Details: {errorDetails}");
+                    errorMessage = "Failed to download upscaled image. " + errorDetails;
                 }
             }
-            errorMessage = "Something unexpected happened. Please try again.";
+
+            errorMessage = errorMessage ?? "Something unexpected happened. Please try again.";
             return (false, null, errorMessage);
         }
 
-        private void SaveUpscaledImage(string generationId, Image upscaledImage)
+
+        private void SaveUpscaledImage(string generationId, byte[] upscaledImageData)
         {
             string logFilePath = Path.Combine(UpscaleOutputFolder, "ID_Filename_Log.txt");
-            string filename = GetFilenameFromLog(logFilePath, generationId);
+            var fileDetails = GetFileDetailsFromLog(logFilePath, generationId);
 
-            if (!string.IsNullOrEmpty(filename))
+            if (fileDetails != null && fileDetails.ContainsKey("filename") && fileDetails.ContainsKey("output_format"))
             {
-                string fileExtension = Path.GetExtension(filename);
-                string upscaledFilename = $"{Path.GetFileNameWithoutExtension(filename)}_upscaled{fileExtension}";
+                string originalFilename = (string)fileDetails["filename"];
+                string outputFormat = (string)fileDetails["output_format"];
+                string fileExtension = $".{outputFormat}";
+                string upscaledFilenameNoExtension = $"{Path.GetFileNameWithoutExtension(originalFilename)}_upscaled";
+
+                int index = 2;
+                string upscaledFilename = $"{upscaledFilenameNoExtension}{fileExtension}";
                 string filePath = Path.Combine(UpscaleOutputFolder, upscaledFilename);
 
-                upscaledImage.Save(filePath);
+                // Check if the file exists and increment the filename index until it doesn't
+                while (File.Exists(filePath))
+                {
+                    upscaledFilename = $"{upscaledFilenameNoExtension}_{index}{fileExtension}";
+                    filePath = Path.Combine(UpscaleOutputFolder, upscaledFilename);
+                    index++;
+                }
+
+                File.WriteAllBytes(filePath, upscaledImageData);  // Save the byte array directly to the file
             }
         }
 
-        private string GetFilenameFromLog(string logFilePath, string generationId)
+
+
+        private Dictionary<string, object> GetFileDetailsFromLog(string logFilePath, string generationId)
         {
             if (File.Exists(logFilePath))
             {
@@ -629,13 +641,14 @@ namespace StableDiffusionWinForms
                     var logEntry = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(line);
                     if (logEntry.ContainsKey(generationId))
                     {
-                        return (string)logEntry[generationId]["filename"];
+                        return logEntry[generationId]; // Return the entire dictionary for the generationId
                     }
                 }
             }
 
-            return null;
+            return null; // Return null if no entry is found
         }
+
 
         private void UpdateLogFile(string logFilePath, string generationId)
         {
