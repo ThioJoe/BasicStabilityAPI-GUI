@@ -160,11 +160,11 @@ namespace StableDiffusionWinForms
         {
             List<string> filenames = new List<string>();
             string timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
-            string fileExtension = outputFormat.Equals("jpeg", StringComparison.OrdinalIgnoreCase) ? ".jpeg" : ".png";
+            string fileExtension = outputFormat;
 
             for (int i = 0; i < imageCount; i++)
             {
-                string filename = $"{model}_{timestamp}_{i}{fileExtension}";
+                string filename = $"{model}_{timestamp}_{i}.{fileExtension}";
                 filenames.Add(filename);
             }
 
