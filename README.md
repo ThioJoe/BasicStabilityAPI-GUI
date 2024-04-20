@@ -18,6 +18,10 @@ This repository contains an unofficial set of Python scripts to interact with th
  - Automatically retrieve and download upscaled images
 - Uses log file which details and tracks downloaded/undownloaded images
 
+### Requirements:
+- A stability AI API key is required. You can read some instructions here: https://platform.stability.ai/docs/getting-started
+- If you already have an account you can find your API key in your account settings here: https://platform.stability.ai/account/keys
+
 ## Screenshots
 <img width="550" alt="Window Screenshot" src="https://github.com/ThioJoe/BasicStabilityAPI-GUI/assets/12518330/23190559-b8b2-4add-a73c-002d414fc498">
 
