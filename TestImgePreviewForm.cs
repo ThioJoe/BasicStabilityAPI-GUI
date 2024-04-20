@@ -106,10 +106,6 @@ public partial class TestingImagePreviewForm : Form
     }
 
 
-
-
-
-
     private (double averageWidth, double averageHeight) CalculateAverageDimensions(List<byte[]> imageDataList)
     {
         double totalWidth = 0, totalHeight = 0; // Variables to hold the total width and height of all images.
