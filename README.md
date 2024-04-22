@@ -1,6 +1,6 @@
 # Basic Stable Diffusion API GUI
 
-This repository contains an unofficial set of Python scripts to interact with the Stability AI API for generating and upscaling images using their SD3 and SD3-Turbo models.
+This repository is for an unofficial GUI to interact with the Stability AI API for generating and upscaling images using their SD3 and SD3-Turbo models.
 
 ## Screenshots
 <img width="550" alt="Window Screenshot" src="https://github.com/ThioJoe/BasicStabilityAPI-GUI/assets/12518330/23190559-b8b2-4add-a73c-002d414fc498">
